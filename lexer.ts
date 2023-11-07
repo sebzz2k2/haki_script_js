@@ -5,8 +5,10 @@ export enum TokenType {
     OpenParen,
     CloseParen,
     BinaryOperator,
-    Let
+    Let,
+    EOF,
 }
+
 
 const KEYWORDS: Record<string, TokenType> = {
     "let": TokenType.Let
@@ -76,10 +78,11 @@ export function tokenize(input: string): Token[] {
             }
         }
     }
+    tokens.push({ value: "EOF", type: TokenType.EOF })
     return tokens
 }
 
-const inp = "let x = 1 + 2"
-const tokens = tokenize(inp)
+// const inp = "10"
+// const tokens = tokenize(inp)
 
-console.log(tokens)
+// console.log(tokens)
