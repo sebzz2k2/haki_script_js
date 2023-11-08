@@ -1,6 +1,6 @@
 
 import {
-    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression
+    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression, NullLiteral
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -69,7 +69,12 @@ export default class Parser {
                     kind: "NumericalLiteral",
                     value: Number(this.consume()!.value)
                 } as NumericalLiteral
-
+            case TokenType.Null:
+                this.consume();
+                return {
+                    type: "NullLiteral",
+                    value: "null"
+                } as NullLiteral
             case TokenType.OpenParen:
                 this.consume()
                 const expression = this.parseExpression()
