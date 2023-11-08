@@ -1,4 +1,5 @@
 import Parser from "./frontend/parser";
+import { evaluate } from "./runtime/interpreter"
 
 
 function main() {
@@ -11,7 +12,9 @@ function main() {
             process.exit(0)
         }
         const ast = parser.produceAST(input)
-        console.log(ast)
+        const result = evaluate(ast)
+
+        console.log(result)
     }
 }
 
