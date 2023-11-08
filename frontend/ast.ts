@@ -1,11 +1,11 @@
 export type NodeTypes = "Program" | "NumericalLiteral" | "Identifier" | "BinaryExpression" | "NullLiteral"
 
 export interface Statement {
-    kind: NodeTypes
+    type: NodeTypes
 }
 
 export interface Program extends Statement {
-    kind: "Program"
+    type: "Program"
     body: Statement[]
 }
 export interface Expression extends Statement { }

@@ -29,7 +29,7 @@ export default class Parser {
             const operator = this.consume()!.value
             const right = this.parsePrimaryExpression()
             left = {
-                kind: "BinaryExpression",
+                type: "BinaryExpression",
                 left,
                 right,
                 operator
@@ -46,7 +46,7 @@ export default class Parser {
             const operator = this.consume()!.value
             const right = this.parseMultiplicativeExpression()
             left = {
-                kind: "BinaryExpression",
+                type: "BinaryExpression",
                 left,
                 right,
                 operator
@@ -61,12 +61,12 @@ export default class Parser {
         switch (token) {
             case TokenType.Identifier:
                 return {
-                    kind: "Identifier",
+                    type: "Identifier",
                     symbol: this.consume()!.value
                 } as Identifier
             case TokenType.Number:
                 return {
-                    kind: "NumericalLiteral",
+                    type: "NumericalLiteral",
                     value: Number(this.consume()!.value)
                 } as NumericalLiteral
             case TokenType.Null:
@@ -99,7 +99,7 @@ export default class Parser {
         this.tokens = tokenize(input)
 
         const program: Program = {
-            kind: "Program",
+            type: "Program",
             body: []
         }
         while (this.notEof()) {
