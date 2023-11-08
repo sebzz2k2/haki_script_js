@@ -1,10 +1,18 @@
-import Parser from "./parser";
+import Parser from "./frontend/parser";
 
 
 function main() {
     const parser = new Parser()
-    const ast = parser.produceAST("10 - 5 *( x)")
-    console.log(ast)
+    console.log("haki_script")
+
+    while (true) {
+        const input = prompt("> ")
+        if (input === "exit" || !input) {
+            process.exit(0)
+        }
+        const ast = parser.produceAST(input)
+        console.log(ast)
+    }
 }
 
 main()

@@ -81,8 +81,3 @@ export function tokenize(input: string): Token[] {
     tokens.push({ value: "EOF", type: TokenType.EOF })
     return tokens
 }
-
-// const inp = "10"
-// const tokens = tokenize(inp)
-
-// console.log(tokens)
