@@ -68,8 +68,6 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
                 type: "number"
             } as NumberValue
 
-        case "NullLiteral":
-            return MAKE_NULL()
         case "Identifier":
             return evaluateIdentifier(astNode as Identifier, env)
 
