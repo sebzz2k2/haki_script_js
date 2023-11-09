@@ -1,7 +1,7 @@
-import { AssignmentExpression, BinaryExpression, Identifier } from "../../frontend/ast";
+import { AssignmentExpression, BinaryExpression, Identifier, ObjectLiteral } from "../../frontend/ast";
 import Environment from "../environment";
 import { evaluate } from "../interpreter";
-import { RuntimeValue, NumberValue, MAKE_NULL } from "../value";
+import { RuntimeValue, NumberValue, MAKE_NULL, ObjectValue } from "../value";
 
 export function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
     const lhs = evaluate(expression.left, env)
@@ -35,6 +35,18 @@ export function evaluateIdentifier(expression: Identifier, env: Environment): Ru
     return value
 }
 
+export function evaluateObjectExpression(obj: ObjectLiteral, env: Environment): RuntimeValue {
+    const object = {
+        type: "object",
+        properties: new Map()
+    } as ObjectValue
+
+    for (const { key, value } of obj.properties) {
+        const evaluatedValue = value === undefined ? env.lookupVariable(key) : evaluate(value, env)
+        object.properties.set(key, evaluatedValue)
+    }
+    return object
+}
 export function evaluateAssignmentExpression(expression: AssignmentExpression, env: Environment): RuntimeValue {
     if (expression.assignee.type !== "Identifier") {
         throw new Error("Can only assign to identifiers")

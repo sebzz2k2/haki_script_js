@@ -1,4 +1,12 @@
-export type NodeTypes = "Program" | "VariableDeclaration" | "NumericalLiteral" | "Identifier" | "BinaryExpression" | "AssignmentExpression"
+export type NodeTypes =
+    "Program" |
+    "VariableDeclaration" |
+    "NumericalLiteral" |
+    "Identifier" |
+    "BinaryExpression" |
+    "AssignmentExpression" |
+    "Property" |
+    "ObjectLiteral"
 
 export interface Statement {
     type: NodeTypes
@@ -37,5 +45,13 @@ export interface Identifier extends Expression {
 export interface NumericalLiteral extends Expression {
     type: "NumericalLiteral"
     value: number
+}
+export interface Property extends Expression {
+    key: string
+    value?: Expression // for shorthand syntax
+}
+export interface ObjectLiteral extends Expression {
+    type: "ObjectLiteral"
+    properties: Property[]
 }
 

@@ -1,5 +1,12 @@
-import { RuntimeValue } from "./value"
+import { MAKE_BOOLEAN, MAKE_NULL, RuntimeValue } from "./value"
 
+export function setupGlobalEnv() {
+    const env = new Environment()
+    env.define("true", MAKE_BOOLEAN(true), true)
+    env.define("false", MAKE_BOOLEAN(false), true)
+    env.define("null", MAKE_NULL(), true)
+    return env
+}
 
 export default class Environment {
     private parent?: Environment

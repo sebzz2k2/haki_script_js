@@ -9,6 +9,10 @@ export enum TokenType {
     Let,
     Const,
     EOF,
+    Comma,
+    OpenBrace,
+    CloseBrace,
+    Colon
 }
 
 
@@ -48,6 +52,18 @@ export function tokenize(input: string): Token[] {
         }
         else if (c === "(") {
             tokens.push({ value: c, type: TokenType.OpenParen })
+        }
+        else if (c === ",") {
+            tokens.push({ value: c, type: TokenType.Comma })
+        }
+        else if (c === "{") {
+            tokens.push({ value: c, type: TokenType.OpenBrace })
+        }
+        else if (c === "}") {
+            tokens.push({ value: c, type: TokenType.CloseBrace })
+        }
+        else if (c === ":") {
+            tokens.push({ value: c, type: TokenType.Colon })
         }
         else if (c === ")") {
             tokens.push({ value: c, type: TokenType.CloseParen })

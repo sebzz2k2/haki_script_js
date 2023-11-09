@@ -1,7 +1,16 @@
 
 
 import {
-    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression, VariableDeclaration, AssignmentExpression
+    NumericalLiteral,
+    Identifier,
+    BinaryExpression,
+    Program,
+    Statement,
+    Expression,
+    VariableDeclaration,
+    AssignmentExpression,
+    Property,
+    ObjectLiteral
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -15,8 +24,55 @@ export default class Parser {
         return this.parseAssignmetExpression()
     }
 
+    private parseObjectExpression(): Expression {
+        if (this.at().type !== TokenType.OpenBrace) {
+            return this.parseAdditiveExpression()
+        }
+        this.consume()
+        const properties = new Array<Property>();
+
+        while (this.notEof() && this.at().type !== TokenType.CloseBrace) {
+            const key = this.expect(TokenType.Identifier, "Expected identifier").value
+            if (this.at().type === TokenType.Comma) {
+                this.consume()
+                properties.push({
+                    key,
+                    value: undefined,
+                    type: "Property"
+                } as Property)
+                continue
+            }
+            if (this.at().type === TokenType.CloseBrace) {
+                properties.push({
+                    key,
+                    value: undefined,
+                    type: "Property"
+                } as Property)
+                continue
+            }
+            this.expect(TokenType.Colon, "Expected colon")
+            const value = this.parseExpression()
+            properties.push({
+                key,
+                value,
+                type: "Property"
+            } as Property)
+            if (this.at().type !== TokenType.CloseBrace) {
+                this.expect(TokenType.Comma, "Expected comma")
+            }
+        }
+
+        this.expect(TokenType.CloseBrace, "Expected closing brace")
+
+        return {
+            type: "ObjectLiteral",
+            properties
+        } as ObjectLiteral
+    }
+
     private parseAssignmetExpression(): Expression {
-        const left = this.parseAdditiveExpression()
+
+        const left = this.parseObjectExpression()
 
         if (this.at().type === TokenType.Equals) {
             this.consume()

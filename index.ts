@@ -1,11 +1,11 @@
 import Parser from "./frontend/parser";
-import Environment from "./runtime/environment";
+import { setupGlobalEnv } from "./runtime/environment";
 import { evaluate } from "./runtime/interpreter"
 
 
 function main() {
     const parser = new Parser()
-    const env = new Environment()
+    const env = setupGlobalEnv()
 
     console.log("haki_script")
 
@@ -14,6 +14,7 @@ function main() {
         if (input === "exit" || !input) {
             process.exit(0)
         }
+
         const ast = parser.produceAST(input)
         const result = evaluate(ast, env)
 
