@@ -1,4 +1,4 @@
-export type NodeTypes = "Program" | "NumericalLiteral" | "Identifier" | "BinaryExpression"
+export type NodeTypes = "Program" | "VariableDeclaration" | "NumericalLiteral" | "Identifier" | "BinaryExpression"
 
 export interface Statement {
     type: NodeTypes
@@ -9,6 +9,13 @@ export interface Program extends Statement {
     body: Statement[]
 }
 export interface Expression extends Statement { }
+
+export interface VariableDeclaration extends Statement {
+    type: "VariableDeclaration"
+    constant: boolean,
+    identifier: string
+    value?: Expression
+}
 
 export interface BinaryExpression extends Expression {
     type: "BinaryExpression",

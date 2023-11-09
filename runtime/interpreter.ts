@@ -8,60 +8,19 @@ import {
     BinaryExpression,
     NumericalLiteral,
     Program,
-    Statement, Identifier
+    Statement, Identifier, VariableDeclaration
 } from "../frontend/ast"
 import Environment from "./environment"
+import { evaluateProgram, evaluateVariableDecelaration } from "./eval/statements"
+import { evaluateIdentifier, evaluateBinaryExpression } from "./eval/expressions"
 
 
-function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
 
-    const lhs = evaluate(expression.left, env)
-    const rhs = evaluate(expression.right, env)
-
-    if (lhs.type === "number" && rhs.type === "number") {
-        return evaluateNumericBinaryExpression(lhs as NumberValue, rhs as NumberValue, expression.operator)
-    }
-
-    return MAKE_NULL()
-
-}
-
-function evaluateNumericBinaryExpression(lhs: NumberValue, rhs: NumberValue, operator: string): NumberValue {
-    let result = 0;
-    if (operator === "+") {
-        result = lhs.value + rhs.value
-    }
-    if (operator === "-") {
-        result = lhs.value - rhs.value
-    } if (operator === "*") {
-        result = lhs.value * rhs.value
-    } if (operator === "+") {
-        result = lhs.value + rhs.value
-    }
-
-    return {
-        value: result, type: "number"
-    }
-
-}
-
-function evaluateIdentifier(expression: Identifier, env: Environment): RuntimeValue {
-    const value = env.lookupVariable(expression.symbol)
-    return value
-}
-
-function evaluateProgram(program: Program, env: Environment): RuntimeValue {
-    let lastEvaluated: RuntimeValue = MAKE_NULL()
-
-    for (const statement of program.body) {
-        lastEvaluated = evaluate(statement, env)
-    }
-
-    return lastEvaluated
-}
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch (astNode.type) {
+        case "VariableDeclaration":
+            return evaluateVariableDecelaration(astNode as VariableDeclaration, env)
         case "NumericalLiteral":
             return {
                 value: ((astNode as NumericalLiteral).value),
@@ -78,8 +37,10 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateProgram(astNode as Program, env)
 
         default:
-            console.log("Not set up")
+            console.log("Not set up", astNode)
             process.exit(1)
 
     }
 }
+
+

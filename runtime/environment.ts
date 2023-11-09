@@ -4,22 +4,32 @@ import { RuntimeValue } from "./value"
 export default class Environment {
     private parent?: Environment
     private variables: Map<string, RuntimeValue>
+    private constants: Set<string>
 
     constructor(parentEnv?: Environment) {
         this.parent = parentEnv
         this.variables = new Map()
+        this.constants = new Set()
     }
 
-    public define(name: string, value: RuntimeValue) {
+    public define(name: string, value: RuntimeValue, constant: boolean) {
         if (this.variables.has(name)) {
             throw new Error(`Variable ${name} already defined`)
         }
+        if (constant) {
+            this.constants.add(name)
+        }
         this.variables.set(name, value)
+        return value
     }
 
     public assign(name: string, value: RuntimeValue) {
         const env = this.resolve(name)
+        if (env.constants.has(name)) {
+            throw `Cannot reassign ${name} as it was declared as const`
+        }
         env.variables.set(name, value)
+
         return value
     }
 

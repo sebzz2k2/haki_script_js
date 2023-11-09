@@ -1,6 +1,7 @@
 
+
 import {
-    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression
+    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression, VariableDeclaration
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -19,6 +20,51 @@ export default class Parser {
     }
     private consume() {
         return this.tokens.shift()
+    }
+
+    private parseVariableDeclaration(): Statement {
+        const token = this.consume()
+        const isConstant = token && token.type === TokenType.Const;
+        const identifier = this.expect(TokenType.Identifier, "Expected let or const").value
+        if (this.at().type === TokenType.SemiColon) {
+            this.consume()
+            if (isConstant) {
+                throw ("Must assign value to constants. No value provided")
+            }
+            return {
+                type: "VariableDeclaration",
+                identifier: identifier,
+                constant: false
+            } as VariableDeclaration
+        }
+
+        this.expect(TokenType.Equals, "Expected equals")
+
+        const declatration = {
+            type: "VariableDeclaration",
+            constant: isConstant,
+            identifier,
+            value: this.parseExpression()
+        } as VariableDeclaration
+
+        this.expect(TokenType.SemiColon, "Variable declaration must end in semi colon")
+
+        return declatration
+
+    }
+
+
+
+
+    private expect(toknType: TokenType, errorMsg: string) {
+        const previous = this.tokens.shift() as Token
+
+        if (!previous || previous.type !== toknType) {
+            console.error(errorMsg)
+            process.exit(0)
+        }
+
+        return previous
     }
 
 
@@ -71,13 +117,9 @@ export default class Parser {
                 } as NumericalLiteral
             case TokenType.OpenParen:
                 this.consume()
-                const expression = this.parseExpression()
-                if (this.at().type !== TokenType.CloseParen) {
-                    console.error("Expected closing parenthesis")
-                    process.exit(1)
-                }
-                this.consume()
-                return expression
+                const value = this.parseExpression()
+                this.expect(TokenType.CloseParen, "Expecting closing parenthesis")
+                return value
             default:
                 console.error("Unexpected token", this.at())
                 process.exit(1)
@@ -85,13 +127,18 @@ export default class Parser {
     }
 
     private parseStatement(): Statement {
-        return this.parseExpression()
+        switch (this.at().type) {
+            case TokenType.Let:
+            case TokenType.Const:
+                return this.parseVariableDeclaration()
+            default:
+                return this.parseExpression()
+        }
     }
 
 
     public produceAST(input: string): Program {
         this.tokens = tokenize(input)
-
         const program: Program = {
             type: "Program",
             body: []
@@ -99,9 +146,7 @@ export default class Parser {
         while (this.notEof()) {
             program.body.push(this.parseStatement())
         }
-
         return program
-
     }
 }
 
