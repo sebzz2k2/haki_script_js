@@ -1,5 +1,5 @@
 import {
-    NullValue,
+    MAKE_NULL,
     NumberValue,
     RuntimeValue,
 } from "./value"
@@ -22,10 +22,7 @@ function evaluateBinaryExpression(expression: BinaryExpression, env: Environment
         return evaluateNumericBinaryExpression(lhs as NumberValue, rhs as NumberValue, expression.operator)
     }
 
-    return {
-        type: "null",
-        value: "null"
-    } as NullValue
+    return MAKE_NULL()
 
 }
 
@@ -54,10 +51,7 @@ function evaluateIdentifier(expression: Identifier, env: Environment): RuntimeVa
 }
 
 function evaluateProgram(program: Program, env: Environment): RuntimeValue {
-    let lastEvaluated: RuntimeValue = {
-        type: "null",
-        value: "null"
-    } as NullValue
+    let lastEvaluated: RuntimeValue = MAKE_NULL()
 
     for (const statement of program.body) {
         lastEvaluated = evaluate(statement, env)
@@ -75,9 +69,7 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             } as NumberValue
 
         case "NullLiteral":
-            return {
-                value: "null", type: "null"
-            } as NullValue
+            return MAKE_NULL()
         case "Identifier":
             return evaluateIdentifier(astNode as Identifier, env)
 
