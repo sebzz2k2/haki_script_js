@@ -1,7 +1,7 @@
 
 
 import {
-    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression, VariableDeclaration
+    NumericalLiteral, Identifier, BinaryExpression, Program, Statement, Expression, VariableDeclaration, AssignmentExpression
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -12,12 +12,28 @@ export default class Parser {
     }
 
     private parseExpression(): Expression {
-        return this.parseAdditiveExpression()
+        return this.parseAssignmetExpression()
+    }
+
+    private parseAssignmetExpression(): Expression {
+        const left = this.parseAdditiveExpression()
+
+        if (this.at().type === TokenType.Equals) {
+            this.consume()
+            const right = this.parseAssignmetExpression()
+            return {
+                type: "AssignmentExpression",
+                assignee: left,
+                value: right
+            } as AssignmentExpression
+        }
+        return left
     }
 
     private at() {
         return this.tokens[0]
     }
+
     private consume() {
         return this.tokens.shift()
     }
@@ -37,20 +53,15 @@ export default class Parser {
                 constant: false
             } as VariableDeclaration
         }
-
         this.expect(TokenType.Equals, "Expected equals")
-
         const declatration = {
             type: "VariableDeclaration",
             constant: isConstant,
             identifier,
             value: this.parseExpression()
         } as VariableDeclaration
-
         this.expect(TokenType.SemiColon, "Variable declaration must end in semi colon")
-
         return declatration
-
     }
 
 
@@ -58,12 +69,10 @@ export default class Parser {
 
     private expect(toknType: TokenType, errorMsg: string) {
         const previous = this.tokens.shift() as Token
-
         if (!previous || previous.type !== toknType) {
             console.error(errorMsg)
             process.exit(0)
         }
-
         return previous
     }
 

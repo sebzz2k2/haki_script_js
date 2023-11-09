@@ -1,5 +1,4 @@
 import {
-    MAKE_NULL,
     NumberValue,
     RuntimeValue,
 } from "./value"
@@ -8,14 +7,11 @@ import {
     BinaryExpression,
     NumericalLiteral,
     Program,
-    Statement, Identifier, VariableDeclaration
+    Statement, Identifier, VariableDeclaration, AssignmentExpression
 } from "../frontend/ast"
 import Environment from "./environment"
 import { evaluateProgram, evaluateVariableDecelaration } from "./eval/statements"
-import { evaluateIdentifier, evaluateBinaryExpression } from "./eval/expressions"
-
-
-
+import { evaluateIdentifier, evaluateBinaryExpression, evaluateAssignmentExpression } from "./eval/expressions"
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch (astNode.type) {
@@ -26,7 +22,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
                 value: ((astNode as NumericalLiteral).value),
                 type: "number"
             } as NumberValue
-
+        case "AssignmentExpression":
+            return evaluateAssignmentExpression(astNode as AssignmentExpression, env)
         case "Identifier":
             return evaluateIdentifier(astNode as Identifier, env)
 

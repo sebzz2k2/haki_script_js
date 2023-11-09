@@ -1,19 +1,15 @@
-import { BinaryExpression, Identifier } from "../../frontend/ast";
+import { AssignmentExpression, BinaryExpression, Identifier } from "../../frontend/ast";
 import Environment from "../environment";
 import { evaluate } from "../interpreter";
 import { RuntimeValue, NumberValue, MAKE_NULL } from "../value";
 
 export function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
-
     const lhs = evaluate(expression.left, env)
     const rhs = evaluate(expression.right, env)
-
     if (lhs.type === "number" && rhs.type === "number") {
         return evaluateNumericBinaryExpression(lhs as NumberValue, rhs as NumberValue, expression.operator)
     }
-
     return MAKE_NULL()
-
 }
 
 export function evaluateNumericBinaryExpression(lhs: NumberValue, rhs: NumberValue, operator: string): NumberValue {
@@ -28,7 +24,6 @@ export function evaluateNumericBinaryExpression(lhs: NumberValue, rhs: NumberVal
     } if (operator === "+") {
         result = lhs.value + rhs.value
     }
-
     return {
         value: result, type: "number"
     }
@@ -38,4 +33,12 @@ export function evaluateNumericBinaryExpression(lhs: NumberValue, rhs: NumberVal
 export function evaluateIdentifier(expression: Identifier, env: Environment): RuntimeValue {
     const value = env.lookupVariable(expression.symbol)
     return value
+}
+
+export function evaluateAssignmentExpression(expression: AssignmentExpression, env: Environment): RuntimeValue {
+    if (expression.assignee.type !== "Identifier") {
+        throw new Error("Can only assign to identifiers")
+    }
+    const value = (expression.assignee as Identifier).symbol
+    return env.assign(value, evaluate(expression.value, env))
 }

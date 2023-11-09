@@ -1,4 +1,4 @@
-export type NodeTypes = "Program" | "VariableDeclaration" | "NumericalLiteral" | "Identifier" | "BinaryExpression"
+export type NodeTypes = "Program" | "VariableDeclaration" | "NumericalLiteral" | "Identifier" | "BinaryExpression" | "AssignmentExpression"
 
 export interface Statement {
     type: NodeTypes
@@ -10,6 +10,11 @@ export interface Program extends Statement {
 }
 export interface Expression extends Statement { }
 
+export interface AssignmentExpression extends Expression {
+    type: "AssignmentExpression"
+    assignee: Expression // for objects
+    value: Expression
+}
 export interface VariableDeclaration extends Statement {
     type: "VariableDeclaration"
     constant: boolean,
