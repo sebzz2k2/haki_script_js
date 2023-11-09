@@ -1,9 +1,13 @@
 import Parser from "./frontend/parser";
+import Environment from "./runtime/environment";
 import { evaluate } from "./runtime/interpreter"
+import { NumberValue } from "./runtime/value";
 
 
 function main() {
     const parser = new Parser()
+    const env = new Environment()
+    env.define("x", { type: "number", value: 10 } as NumberValue)
     console.log("haki_script")
 
     while (true) {
@@ -12,7 +16,7 @@ function main() {
             process.exit(0)
         }
         const ast = parser.produceAST(input)
-        const result = evaluate(ast)
+        const result = evaluate(ast, env)
 
         console.log(result)
     }

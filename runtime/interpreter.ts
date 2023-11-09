@@ -8,14 +8,15 @@ import {
     BinaryExpression,
     NumericalLiteral,
     Program,
-    Statement
+    Statement, Identifier
 } from "../frontend/ast"
+import Environment from "./environment"
 
 
-function evaluateBinaryExpression(expression: BinaryExpression): RuntimeValue {
+function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
 
-    const lhs = evaluate(expression.left)
-    const rhs = evaluate(expression.right)
+    const lhs = evaluate(expression.left, env)
+    const rhs = evaluate(expression.right, env)
 
     if (lhs.type === "number" && rhs.type === "number") {
         return evaluateNumericBinaryExpression(lhs as NumberValue, rhs as NumberValue, expression.operator)
@@ -47,20 +48,25 @@ function evaluateNumericBinaryExpression(lhs: NumberValue, rhs: NumberValue, ope
 
 }
 
-function evaluateProgram(program: Program): RuntimeValue {
+function evaluateIdentifier(expression: Identifier, env: Environment): RuntimeValue {
+    const value = env.lookupVariable(expression.symbol)
+    return value
+}
+
+function evaluateProgram(program: Program, env: Environment): RuntimeValue {
     let lastEvaluated: RuntimeValue = {
         type: "null",
         value: "null"
     } as NullValue
 
     for (const statement of program.body) {
-        lastEvaluated = evaluate(statement)
+        lastEvaluated = evaluate(statement, env)
     }
 
     return lastEvaluated
 }
 
-export function evaluate(astNode: Statement): RuntimeValue {
+export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch (astNode.type) {
         case "NumericalLiteral":
             return {
@@ -72,12 +78,14 @@ export function evaluate(astNode: Statement): RuntimeValue {
             return {
                 value: "null", type: "null"
             } as NullValue
+        case "Identifier":
+            return evaluateIdentifier(astNode as Identifier, env)
 
         case "BinaryExpression":
-            return evaluateBinaryExpression(astNode as BinaryExpression)
+            return evaluateBinaryExpression(astNode as BinaryExpression, env)
 
         case "Program":
-            return evaluateProgram(astNode as Program)
+            return evaluateProgram(astNode as Program, env)
 
         default:
             console.log("Not set up")
