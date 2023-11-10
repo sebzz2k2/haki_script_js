@@ -12,7 +12,10 @@ export enum TokenType {
     Comma,
     OpenBrace,
     CloseBrace,
-    Colon
+    Colon,
+    OpenBracket,
+    CloseBracket,
+    Dot
 }
 
 
@@ -49,6 +52,15 @@ export function tokenize(input: string): Token[] {
                 value: c,
                 type: TokenType.SemiColon
             })
+        }
+        else if (c === "[") {
+            tokens.push({ value: c, type: TokenType.OpenBracket })
+        }
+        else if (c === "]") {
+            tokens.push({ value: c, type: TokenType.CloseBracket })
+        }
+        else if (c === ".") {
+            tokens.push({ value: c, type: TokenType.Dot })
         }
         else if (c === "(") {
             tokens.push({ value: c, type: TokenType.OpenParen })
