@@ -1,7 +1,7 @@
-import { AssignmentExpression, BinaryExpression, Identifier, ObjectLiteral } from "../../frontend/ast";
+import { AssignmentExpression, BinaryExpression, CallExpression, Identifier, ObjectLiteral } from "../../frontend/ast";
 import Environment from "../environment";
 import { evaluate } from "../interpreter";
-import { RuntimeValue, NumberValue, MAKE_NULL, ObjectValue } from "../value";
+import { RuntimeValue, NumberValue, MAKE_NULL, ObjectValue, NativeFunctionValue } from "../value";
 
 export function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
     const lhs = evaluate(expression.left, env)
@@ -40,12 +40,19 @@ export function evaluateObjectExpression(obj: ObjectLiteral, env: Environment): 
         type: "object",
         properties: new Map()
     } as ObjectValue
-
     for (const { key, value } of obj.properties) {
         const evaluatedValue = value === undefined ? env.lookupVariable(key) : evaluate(value, env)
         object.properties.set(key, evaluatedValue)
     }
     return object
+}
+export function evaluateCallExpression(callExpression: CallExpression, env: Environment): RuntimeValue {
+    const args = callExpression.arguments.map(arg => evaluate(arg, env))
+    const caller = evaluate(callExpression.caller, env)
+    if (caller.type !== "nativeFunction") {
+        throw "cannot call value that is not a function"
+    }
+    return (caller as NativeFunctionValue).callMethod(args, env)
 }
 export function evaluateAssignmentExpression(expression: AssignmentExpression, env: Environment): RuntimeValue {
     if (expression.assignee.type !== "Identifier") {

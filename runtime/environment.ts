@@ -1,10 +1,19 @@
-import { MAKE_BOOLEAN, MAKE_NULL, RuntimeValue } from "./value"
+import { MAKE_BOOLEAN, MAKE_NATIVE_FUNCTION, MAKE_NULL, MAKE_NUMBER, RuntimeValue } from "./value"
 
 export function setupGlobalEnv() {
     const env = new Environment()
     env.define("true", MAKE_BOOLEAN(true), true)
     env.define("false", MAKE_BOOLEAN(false), true)
     env.define("null", MAKE_NULL(), true)
+
+    env.define("print", MAKE_NATIVE_FUNCTION((args, _scope) => {
+        console.log(...args)
+        return MAKE_NULL()
+    }), true)
+
+    env.define("time", MAKE_NATIVE_FUNCTION((_args: RuntimeValue[], _env: Environment) => {
+        return MAKE_NUMBER(Date.now())
+    }), true)
     return env
 }
 
