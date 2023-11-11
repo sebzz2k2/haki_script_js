@@ -7,16 +7,18 @@ import {
     BinaryExpression,
     NumericalLiteral,
     Program,
-    Statement, Identifier, VariableDeclaration, AssignmentExpression, ObjectLiteral, CallExpression
+    Statement, Identifier, VariableDeclaration, AssignmentExpression, ObjectLiteral, CallExpression, FunctionDeclaration
 } from "../frontend/ast"
 import Environment from "./environment"
-import { evaluateProgram, evaluateVariableDecelaration } from "./eval/statements"
+import { evaluateFunctionDeclaration, evaluateProgram, evaluateVariableDecelaration } from "./eval/statements"
 import { evaluateIdentifier, evaluateBinaryExpression, evaluateAssignmentExpression, evaluateObjectExpression, evaluateCallExpression } from "./eval/expressions"
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch (astNode.type) {
         case "VariableDeclaration":
             return evaluateVariableDecelaration(astNode as VariableDeclaration, env)
+        case "FunctionDeclaration":
+            return evaluateFunctionDeclaration(astNode as FunctionDeclaration, env)
         case "ObjectLiteral":
             return evaluateObjectExpression(astNode as ObjectLiteral, env)
         case "NumericalLiteral":

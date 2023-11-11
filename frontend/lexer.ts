@@ -15,13 +15,15 @@ export enum TokenType {
     Colon,
     OpenBracket,
     CloseBracket,
-    Dot
+    Dot,
+    Fn
 }
 
 
 const KEYWORDS: Record<string, TokenType> = {
     "let": TokenType.Let,
-    "const": TokenType.Const
+    "const": TokenType.Const,
+    "fn": TokenType.Fn
 }
 
 export interface Token {

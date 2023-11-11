@@ -1,5 +1,3 @@
-
-
 import {
     NumericalLiteral,
     Identifier,
@@ -12,7 +10,8 @@ import {
     Property,
     ObjectLiteral,
     CallExpression,
-    MemberExpression
+    MemberExpression,
+    FunctionDeclaration
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -123,11 +122,14 @@ export default class Parser {
     }
 
     private expect(toknType: TokenType, errorMsg: string) {
+
         const previous = this.tokens.shift() as Token
+
         if (!previous || previous.type !== toknType) {
-            console.error(errorMsg)
+            console.error(toknType, errorMsg)
             process.exit(0)
         }
+
         return previous
     }
 
@@ -210,8 +212,6 @@ export default class Parser {
         }
         return object
     }
-
-
     private parseAdditiveExpression(): Expression {
         let left = this.parseMultiplicativeExpression()
 
@@ -228,7 +228,6 @@ export default class Parser {
 
         return left
     }
-
     private parsePrimaryExpression(): Expression {
         const token = this.at().type;
         switch (token) {
@@ -252,15 +251,43 @@ export default class Parser {
                 process.exit(1)
         }
     }
-
     private parseStatement(): Statement {
         switch (this.at().type) {
+            case TokenType.Fn:
+                const abc = this.parseFunctionDeclaration()
+                return abc
             case TokenType.Let:
             case TokenType.Const:
                 return this.parseVariableDeclaration()
             default:
                 return this.parseExpression()
         }
+    }
+    private parseFunctionDeclaration(): Statement {
+        this.consume()
+        const name = this.expect(TokenType.Identifier, "Expected identifier").value
+        const args = this.parseArguments()
+        const params: string[] = []
+        for (const arg of args) {
+            if (arg.type !== "Identifier") {
+                throw "Expected identifier"
+            }
+            params.push((arg as Identifier).symbol)
+        }
+        this.expect(TokenType.OpenBrace, "Expected opening brace")
+        const body: Statement[] = []
+
+        while (this.at().type !== TokenType.EOF && this.at().type !== TokenType.CloseBrace) {
+            body.push(this.parseStatement())
+        }
+
+        this.expect(TokenType.CloseBrace, "Expected closing brace")
+        return {
+            type: "FunctionDeclaration",
+            name,
+            params,
+            body
+        } as FunctionDeclaration
     }
 
     public produceAST(input: string): Program {

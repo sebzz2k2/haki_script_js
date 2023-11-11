@@ -8,7 +8,8 @@ export type NodeTypes =
     "Property" |
     "ObjectLiteral" |
     "MemberExpression" |
-    "CallExpression"
+    "CallExpression" |
+    "FunctionDeclaration"
 
 export interface Statement {
     type: NodeTypes
@@ -69,3 +70,9 @@ export interface ObjectLiteral extends Expression {
     properties: Property[]
 }
 
+export interface FunctionDeclaration extends Statement {
+    type: "FunctionDeclaration"
+    name: string
+    body: Statement[]
+    params: string[]
+}

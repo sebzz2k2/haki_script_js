@@ -1,7 +1,7 @@
 import { AssignmentExpression, BinaryExpression, CallExpression, Identifier, ObjectLiteral } from "../../frontend/ast";
 import Environment from "../environment";
 import { evaluate } from "../interpreter";
-import { RuntimeValue, NumberValue, MAKE_NULL, ObjectValue, NativeFunctionValue } from "../value";
+import { RuntimeValue, NumberValue, MAKE_NULL, ObjectValue, NativeFunctionValue, FunctionValue } from "../value";
 
 export function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
     const lhs = evaluate(expression.left, env)
@@ -49,10 +49,25 @@ export function evaluateObjectExpression(obj: ObjectLiteral, env: Environment): 
 export function evaluateCallExpression(callExpression: CallExpression, env: Environment): RuntimeValue {
     const args = callExpression.arguments.map(arg => evaluate(arg, env))
     const caller = evaluate(callExpression.caller, env)
-    if (caller.type !== "nativeFunction") {
-        throw "cannot call value that is not a function"
+    if (caller.type === "nativeFunction") {
+        return (caller as NativeFunctionValue).callMethod(args, env)
     }
-    return (caller as NativeFunctionValue).callMethod(args, env)
+    if (caller.type === "function") {
+        const functionValue = caller as FunctionValue
+        const newEnv = new Environment(functionValue.env)
+        for (let i = 0; i < functionValue.params.length; i++) {
+            if (args[i] === undefined) {
+                throw new Error("Not enough arguments")
+            }
+            newEnv.define(functionValue.params[i], args[i], false)
+        }
+        let result: RuntimeValue = MAKE_NULL()
+        for (const statement of functionValue.body) {
+            result = evaluate(statement, newEnv)
+        }
+        return result
+    }
+    throw new Error("Not implemented")
 }
 export function evaluateAssignmentExpression(expression: AssignmentExpression, env: Environment): RuntimeValue {
     if (expression.assignee.type !== "Identifier") {

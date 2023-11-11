@@ -1,6 +1,7 @@
+import { Statement } from "../frontend/ast"
 import Environment from "./environment"
 
-export type valueTypes = "null" | "number" | "boolean" | "object" | "nativeFunction"
+export type valueTypes = "null" | "number" | "boolean" | "object" | "nativeFunction" | "function"
 
 export interface RuntimeValue {
     type: valueTypes
@@ -30,6 +31,14 @@ export type functionCall = (args: RuntimeValue[], env: Environment) => RuntimeVa
 export interface NativeFunctionValue extends RuntimeValue {
     type: "nativeFunction"
     callMethod: functionCall
+}
+
+export interface FunctionValue extends RuntimeValue {
+    type: "function"
+    body: Statement[]
+    params: string[]
+    env: Environment
+    name: string
 }
 
 export function MAKE_NATIVE_FUNCTION(callMethod: functionCall): NativeFunctionValue {
